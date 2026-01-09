@@ -12,6 +12,7 @@ import '../widgets/user_management_section.dart';
 import '../widgets/admin_vault_list.dart';
 import '../widgets/admin_feed_list.dart';
 import 'admin_support_page.dart';
+import 'admin_release_page.dart';
 import '../../../../core/services/notification_service.dart';
 import '../../../../injection_container.dart' as di;
 
@@ -154,7 +155,21 @@ class AdminPage extends StatelessWidget {
                   const AdminFeedList(),
                   const Divider(color: LustrousTheme.lustrousGold, height: 40),
                   _buildSectionHeader('Sistem Güncelleme'),
-                  const UploadAppUpdateForm(),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (_) => const AdminReleasePage()));
+                      },
+                      icon: const Icon(Icons.cloud_upload, color: Colors.blueAccent),
+                      label: const Text('YENİ SÜRÜM YÜKLE (B2)', style: TextStyle(color: Colors.blueAccent)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.black,
+                        side: const BorderSide(color: Colors.blueAccent),
+                      ),
+                    ),
+                  ),
                   const Divider(color: LustrousTheme.lustrousGold, height: 40),
                   _buildSectionHeader('Kullanıcı Yönetimi (VIP & Ban)'),
                   const UserManagementSection(),

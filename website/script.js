@@ -41,24 +41,44 @@ try {
                             systemStatus.style.color = "#00ff00";
                         }
 
-                        // Update Android Version & Link
+                        // Update Android
                         const version = data.latest_version || 'Unknown';
-                        const url = data.download_url || '#';
+                        const apkUrl = data.download_url || '#';
+                        const iosUrl = data.ios_install_link || '#';
 
                         androidVersionEl.innerText = `Latest: v${version}`;
 
-                        if (url && url !== '#') {
-                            androidBtn.href = url;
+                        // Android Button
+                        if (apkUrl && apkUrl !== '#') {
+                            androidBtn.href = apkUrl;
                             androidBtn.classList.remove('disabled');
                             androidBtn.querySelector('span').innerText = "DOWNLOAD APK";
                         } else {
                             androidBtn.classList.add('disabled');
                             androidBtn.querySelector('span').innerText = "COMING SOON";
                         }
+
+                        // iOS Button Logic
+                        const iosBtn = document.querySelector('.platform-card.ios .btn-download');
+                        const iosStatus = document.querySelector('.platform-card.ios .platform-info p');
+
+                        if (iosUrl && iosUrl !== '#') {
+                            iosBtn.href = iosUrl;
+                            iosBtn.classList.remove('secondary'); // Make it primary gold
+                            iosBtn.classList.remove('disabled');
+                            iosBtn.querySelector('span').innerText = "INSTALL APP";
+                            iosStatus.innerText = `Latest: v${version}`;
+                        } else {
+                            iosBtn.href = "#";
+                            iosBtn.classList.add('disabled');
+                            iosBtn.querySelector('span').innerText = "UNAVAILABLE";
+                            iosStatus.innerText = "Enterprise Sign";
+                        }
+
                     }
                 }, (error) => {
                     console.error("Error fetching updates:", error);
-                    androidVersionEl.innerText = "Error: " + error.code; // Show exact Firestore error
+                    androidVersionEl.innerText = "Error: " + error.code;
                 });
         })
         .catch((error) => {

@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LustrousLux | B2 Deploy</title>
+    <link rel="stylesheet" href="../style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Outfit:wght@200;300;400;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Firebase SDKs (Only for Firestore Database) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
+    <style>
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .login-box {
+            background: rgba(20, 20, 20, 0.9);
+            border: 1px solid #D4AF37;
+            padding: 40px;
+            text-align: center;
+            border-radius: 8px;
+        }
+
+        .login-box input {
+            background: transparent;
+            border: 1px solid #333;
+            color: #D4AF37;
+            padding: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .upload-container {
+            max-width: 600px;
+            margin: 100px auto;
+            padding: 20px;
+            background: rgba(20, 20, 20, 0.8);
+            border: 1px solid #333;
+            border-radius: 12px;
+        }
+
+        .upload-card {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px dashed #555;
+            text-align: center;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #333;
+            margin-top: 10px;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #D4AF37;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="noise-overlay"></div>
+    <div class="glass-bg"></div>
+
+    <div id="login-overlay" class="login-overlay">
+        <div class="login-box">
+            <h2 style="color: #D4AF37; margin-bottom: 20px;">SYSTEM ACCESS</h2>
+            <input type="password" id="admin-pass" placeholder="ENTER ACCESS CODE">
+            <button class="btn-download" onclick="checkAuth()"><span>AUTHENTICATE</span></button>
+        </div>
+    </div>
+
+    <nav>
+        <div class="logo">LUSTROUS LUX</div>
+        <div class="status-indicator">
+            <span class="dot"></span>
+            <span style="color: #D4AF37;">B2 CONSOLE</span>
+        </div>
+    </nav>
+
+    <div class="upload-container hidden" id="main-content">
+        <h1 style="text-align: center; margin-bottom: 40px;">B2 DEPLOYMENT</h1>
+
+        <div class="upload-card">
+            <i class="fab fa-android" style="font-size: 30px; color: #a4c639; margin-bottom: 10px;"></i>
+            <h3>Android APK</h3>
+            <input type="file" id="apk-file" accept=".apk" style="display: none">
+            <button class="btn-download secondary" onclick="document.getElementById('apk-file').click()"><span>SELECT
+                    APK</span></button>
+            <p id="apk-name" style="margin-top: 10px; color: #D4AF37;"></p>
+            <div class="progress-bar">
+                <div id="apk-progress" class="progress-fill"></div>
+            </div>
+        </div>
+
+        <div class="upload-card">
+            <i class="fab fa-apple" style="font-size: 30px; color: #fff; margin-bottom: 10px;"></i>
+            <h3>iOS IPA</h3>
+            <input type="file" id="ipa-file" accept=".ipa" style="display: none">
+            <button class="btn-download secondary" onclick="document.getElementById('ipa-file').click()"><span>SELECT
+                    IPA</span></button>
+            <p id="ipa-name" style="margin-top: 10px; color: #D4AF37;"></p>
+            <div class="progress-bar">
+                <div id="ipa-progress" class="progress-fill"></div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px;">
+            <div style="margin-bottom: 20px;">
+                <label style="color: #888;">Version (e.g. 1.2.0)</label><br>
+                <input type="text" id="version-input"
+                    style="background: transparent; border: 1px solid #333; color: white; padding: 8px; text-align: center; margin-top: 5px;">
+            </div>
+            <button class="btn-download" onclick="startB2Upload()"><span>DEPLOY TO B2</span></button>
+            <p id="status-msg" style="margin-top: 20px; color: #888;"></p>
+        </div>
+    </div>
+
+    <script>
+        // 1. FIREBASE FOR CONFIG (Still needed for App Config)
+        const firebaseConfig = {
+            apiKey: "AIzaSyAgoWz1lwNGhunRzCl-qtgALZcctfGF_xI",
+            authDomain: "programolur.firebaseapp.com",
+            projectId: "programolur",
+            storageBucket: "programolur.firebasestorage.app",
+            messagingSenderId: "746136349673",
+            appId: "1:746136349673:web:fbc2cd5a8732420a33f978"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // 2. BACKBLAZE CREDENTIALS
+        const B2_KEY_ID = '4cdaff7e8d1a';
+        const B2_APP_KEY = '005009d79e72e4ec8c212709ec52b15dc269bcbaa0';
+
+        // 3. STATE
+        let b2AuthData = null;
+
+        function checkAuth() {
+            const pass = document.getElementById('admin-pass').value;
+            if (pass === 'admin123' || pass === 'lustrous') {
+                document.getElementById('login-overlay').classList.add('hidden');
+                document.getElementById('main-content').classList.remove('hidden');
+            } else { alert('ACCESS DENIED'); }
+        }
+
+        document.getElementById('apk-file').addEventListener('change', e => { if (e.target.files[0]) document.getElementById('apk-name').innerText = e.target.files[0].name; });
+        document.getElementById('ipa-file').addEventListener('change', e => { if (e.target.files[0]) document.getElementById('ipa-name').innerText = e.target.files[0].name; });
+
+        async function startB2Upload() {
+            const apkFile = document.getElementById('apk-file').files[0];
+            const ipaFile = document.getElementById('ipa-file').files[0];
+            const version = document.getElementById('version-input').value;
+            const status = document.getElementById('status-msg');
+
+            if (!version) { alert('No version'); return; }
+            if (!apkFile && !ipaFile) { alert('No file'); return; }
+
+            try {
+                status.innerText = "Authenticating with B2...";
+
+                // --- STEP 1: AUTHENTICATE ---
+                const authResp = await fetch('https://api.backblazeb2.com/b2api/v2/b2_authorize_account', {
+                    headers: { 'Authorization': 'Basic ' + btoa(B2_KEY_ID + ':' + B2_APP_KEY) }
+                });
+                if (!authResp.ok) throw new Error('B2 Auth Failed');
+                b2AuthData = await authResp.json();
+
+                // Get or Find Bucket
+                let bucketId = b2AuthData.allowed.bucketId;
+                let bucketName = b2AuthData.allowed.bucketName;
+
+                if (!bucketId) {
+                    // Check if we need to list buckets? Assuming user has one. 
+                    // Since key is master-ish or has access, let's list.
+                    const listResp = await fetch(b2AuthData.apiUrl + '/b2api/v2/b2_list_buckets', {
+                        method: 'POST',
+                        headers: { 'Authorization': b2AuthData.authorizationToken },
+                        body: JSON.stringify({ accountId: b2AuthData.accountId })
+                    });
+                    const listData = await listResp.json();
+                    if (listData.buckets && listData.buckets.length > 0) {
+                        bucketId = listData.buckets[0].bucketId;
+                        bucketName = listData.buckets[0].bucketName;
+                    } else { throw new Error("No buckets found!"); }
+                }
+
+                // --- STEP 2: ENSURE CORS (CRITICAL FOR BROWSER UPLOAD) ---
+                status.innerText = "Configuring Bucket CORS...";
+                try {
+                    await fetch(b2AuthData.apiUrl + '/b2api/v2/b2_update_bucket', {
+                        method: 'POST',
+                        headers: { 'Authorization': b2AuthData.authorizationToken },
+                        body: JSON.stringify({
+                            accountId: b2AuthData.accountId,
+                            bucketId: bucketId,
+                            corsRules: [{
+                                corsRuleName: "allowAny",
+                                allowedOrigins: ["https://lustrouslux.netlify.app", "https://lustrouslux.web.app", "http://localhost:5000", "*"],
+                                allowedOperations: ["b2_upload_file"],
+                                allowedHeaders: ["*"],
+                                maxAgeSeconds: 3600
+                            }]
+                        })
+                    });
+                } catch (e) { console.warn("CORS update failed/ignored", e); }
+
+
+                const updates = { latest_version: version };
+
+                // --- STEP 3: UPLOAD HANDLER ---
+                const uploadToB2 = async (file, path, progressId) => {
+                    // Get Upload URL
+                    const urlResp = await fetch(b2AuthData.apiUrl + '/b2api/v2/b2_get_upload_url', {
+                        method: 'POST',
+                        headers: { 'Authorization': b2AuthData.authorizationToken },
+                        body: JSON.stringify({ bucketId: bucketId })
+                    });
+                    const urlData = await urlResp.json();
+
+                    // Hash (SHA1) - Basic implementation
+                    const arrayBuffer = await file.arrayBuffer();
+                    const wordArray = CryptoJS.lib.WordArray.create(arrayBuffer);
+                    const sha1 = CryptoJS.SHA1(wordArray).toString();
+
+                    // Upload
+                    return new Promise((resolve, reject) => {
+                        const xhr = new XMLHttpRequest();
+                        xhr.open("POST", urlData.uploadUrl, true);
+
+                        xhr.setRequestHeader("Authorization", urlData.authorizationToken);
+                        xhr.setRequestHeader("X-Bz-File-Name", encodeURIComponent(path));
+                        xhr.setRequestHeader("Content-Type", file.type || "application/octet-stream");
+                        xhr.setRequestHeader("X-Bz-Content-Sha1", sha1);
+
+                        xhr.upload.onprogress = (e) => {
+                            if (e.lengthComputable) {
+                                const pct = (e.loaded / e.total) * 100;
+                                document.getElementById(progressId).style.width = pct + "%";
+                            }
+                        };
+
+                        xhr.onload = () => {
+                            if (xhr.status === 200) {
+                                // Construct public URL
+                                // https://f002.backblazeb2.com/file/{bucketName}/{fileName}
+                                const downloadUrlBase = b2AuthData.downloadUrl;
+                                const publicUrl = `${downloadUrlBase}/file/${bucketName}/${encodeURIComponent(path)}`;
+                                resolve(publicUrl);
+                            } else {
+                                reject(new Error("Upload failed: " + xhr.responseText));
+                            }
+                        };
+                        xhr.onerror = () => reject(new Error("Network Error"));
+                        xhr.send(file);
+                    });
+                };
+
+                // --- EXECUTE UPLOADS ---
+
+                if (apkFile) {
+                    status.innerText = "Uploading APK to B2...";
+                    const apkUrl = await uploadToB2(apkFile, `releases/android/LustrousLux_v${version}.apk`, 'apk-progress');
+                    updates.download_url = apkUrl;
+                }
+
+                if (ipaFile) {
+                    status.innerText = "Uploading IPA to B2...";
+                    const ipaUrl = await uploadToB2(ipaFile, `releases/ios/LustrousLux_v${version}.ipa`, 'ipa-progress');
+
+                    // Generate Plist
+                    status.innerText = "Generating Manifest...";
+                    const plistContent = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>items</key>
+    <array>
+        <dict>
+            <key>assets</key>
+            <array>
+                <dict>
+                    <key>kind</key>
+                    <string>software-package</string>
+                    <key>url</key>
+                    <string>${ipaUrl}</string>
+                </dict>
+                <dict>
+                    <key>kind</key>
+                    <string>display-image</string>
+                    <key>url</key>
+                    <string>https://lustrouslux.web.app/assets/icon.png</string>
+                </dict>
+                <dict>
+                    <key>kind</key>
+                    <string>full-size-image</string>
+                    <key>url</key>
+                    <string>https://lustrous-lux.web.app/assets/icon.png</string>
+                </dict>
+            </array>
+            <key>metadata</key>
+            <dict>
+                <key>bundle-identifier</key>
+                <string>com.example.lustrousLux</string>
+                <key>bundle-version</key>
+                <string>${version}</string>
+                <key>kind</key>
+                <string>software</string>
+                <key>title</key>
+                <string>LustrousLux</string>
+            </dict>
+        </dict>
+    </array>
+</dict>
+</plist>`;
+                    const plistFile = new File([plistContent], `manifest_v${version}.plist`, { type: "text/xml" });
+                    const plistUrl = await uploadToB2(plistFile, `releases/ios/manifest_v${version}.plist`, 'ipa-progress');
+
+                    updates.ios_plist_url = plistUrl;
+                    updates.ios_install_link = `itms-services://?action=download-manifest&url=${encodeURIComponent(plistUrl)}`;
+                }
+
+                status.innerText = "Updating Database...";
+                await db.collection('app_config').doc('maintenance').set(updates, { merge: true });
+                status.innerText = "SUCCESS! (B2 Deployed) ✅";
+                status.style.color = "#00ff00";
+
+            } catch (e) {
+                console.error(e);
+                status.innerText = "Error: " + e.message;
+                status.style.color = "red";
+                alert(e.message);
+            }
+        }
+    </script>
+</body>
+
+</html>
