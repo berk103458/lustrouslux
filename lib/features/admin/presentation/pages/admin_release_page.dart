@@ -104,13 +104,13 @@ class _AdminReleasePageState extends State<AdminReleasePage> {
                     <key>kind</key>
                     <string>display-image</string>
                     <key>url</key>
-                    <string>https://lustrouslux.web.app/assets/icon.png</string>
+                    <string>https://lustrouslux.web.app/assets/images/logo.png</string>
                 </dict>
                 <dict>
                     <key>kind</key>
                     <string>full-size-image</string>
                     <key>url</key>
-                    <string>https://lustrouslux.web.app/assets/icon.png</string>
+                    <string>https://lustrouslux.web.app/assets/images/logo.png</string>
                 </dict>
             </array>
             <key>metadata</key>
@@ -137,6 +137,8 @@ class _AdminReleasePageState extends State<AdminReleasePage> {
         setState(() => _statusMessage = "Manifest Yükleniyor...");
         final plistUrl = await _backblazeService.uploadFile(plistFile, 'releases/ios/manifest_v$version.plist');
         
+        updates['ios_ipa_url'] = ipaUrl; // Save direct link for non-OTA download
+        updates['ios_ipa_url'] = ipaUrl; // Save direct link for non-OTA download
         updates['ios_plist_url'] = plistUrl;
         updates['ios_install_link'] = "itms-services://?action=download-manifest&url=${Uri.encodeComponent(plistUrl)}";
       }

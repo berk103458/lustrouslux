@@ -64,15 +64,26 @@ try {
 
                         if (iosUrl && iosUrl !== '#') {
                             iosBtn.href = iosUrl;
-                            iosBtn.classList.remove('secondary'); // Make it primary gold
+                            iosBtn.classList.remove('secondary');
                             iosBtn.classList.remove('disabled');
                             iosBtn.querySelector('span').innerText = "INSTALL APP";
                             iosStatus.innerText = `Latest: v${version}`;
+
+                            // Smart Click Handler
+                            iosBtn.onclick = function (e) {
+                                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+                                if (!isIOS) {
+                                    e.preventDefault();
+                                    alert("⚠️ iOS Kurulumu Sadece iPhone/iPad cihazlarda Safari tarayıcısı ile yapılabilir.\n\n(Bu butona PC'den veya Android'den basamazsınız.)");
+                                }
+                            };
+
                         } else {
                             iosBtn.href = "#";
                             iosBtn.classList.add('disabled');
                             iosBtn.querySelector('span').innerText = "UNAVAILABLE";
                             iosStatus.innerText = "Enterprise Sign";
+                            iosBtn.onclick = (e) => e.preventDefault();
                         }
 
                     }

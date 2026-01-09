@@ -148,6 +148,8 @@ class BackblazeService {
     else if (lowerName.endsWith('.png')) contentType = 'image/png';
     else if (lowerName.endsWith('.pdf')) contentType = 'application/pdf';
     else if (lowerName.endsWith('.apk')) contentType = 'application/vnd.android.package-archive';
+    else if (lowerName.endsWith('.ipa')) contentType = 'application/octet-stream';
+    else if (lowerName.endsWith('.plist')) contentType = 'text/xml';
 
     // Encode filename for header (URI encode)
     final encodedFileName = Uri.encodeComponent(fileName);
