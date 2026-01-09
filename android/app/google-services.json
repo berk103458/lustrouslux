@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "746136349673",
+    "project_id": "programolur",
+    "storage_bucket": "programolur.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:746136349673:android:835e0c22d385ef8933f978",
+        "android_client_info": {
+          "package_name": "com.example.lustrous_lux"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC7wOgjs-MA6MoJZSByUGenITGSygnF5Jc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

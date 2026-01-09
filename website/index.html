@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LustrousLux | Exclusive Access</title>
+    <link rel="stylesheet" href="style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Outfit:wght@200;300;400;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+</head>
+
+<body>
+    <div class="noise-overlay"></div>
+    <div class="glass-bg"></div>
+
+    <nav>
+        <div class="logo">LUSTROUS LUX</div>
+        <div class="status-indicator">
+            <span class="dot"></span>
+            <span id="system-status">SYSTEM ONLINE</span>
+        </div>
+    </nav>
+
+    <main>
+        <!-- HERO SECTION -->
+        <section class="hero">
+            <div class="hero-content">
+                <h1 class="fade-in">THE PINNACLE OF<br><span class="gradient-text">DIGITAL WEALTH</span></h1>
+                <p class="subtitle fade-in-delay">
+                    An exclusive sanctuary for the elite. Secure communications,
+                    private vault access, and a curated network of high-value individuals.
+                    <br><strong>Invitation Only.</strong>
+                </p>
+
+                <div class="download-container fade-in-delay-2">
+                    <div class="platform-card android">
+                        <i class="fab fa-android"></i>
+                        <div class="platform-info">
+                            <h3>ANDROID</h3>
+                            <p id="android-version">Fetching ver...</p>
+                        </div>
+                        <a href="#" id="android-btn" class="btn-download disabled">
+                            <span>INITIALIZING...</span>
+                        </a>
+                    </div>
+
+                    <div class="platform-card ios">
+                        <i class="fab fa-apple"></i>
+                        <div class="platform-info">
+                            <h3>iOS</h3>
+                            <p>TestFlight / Enterprise</p>
+                        </div>
+                        <a href="mailto:concierge@lustrouslux.com" class="btn-download secondary">
+                            <span>REQUEST ACCESS</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-visual fade-in-delay">
+                <div class="phone-mockup">
+                    <img src="assets/images/logo.png" alt="App Interface" class="app-logo-glow">
+                </div>
+            </div>
+        </section>
+
+        <!-- FEATURES SECTION -->
+        <section class="features">
+            <div class="feature-card">
+                <i class="fas fa-fingerprint"></i>
+                <h3>Biometric Vault</h3>
+                <p>Military-grade encryption securing your most valuable assets and documents. Only you have the key.
+                </p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-rss"></i>
+                <h3>Exclusive Feed</h3>
+                <p>Real-time intelligence and opportunities curated for the 1%. Stay ahead of the curve.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-crown"></i>
+                <h3>Concierge Service</h3>
+                <p>Direct access to our dedicated lifestyle management team. Your wish is our command.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2026 USTROUS LUX. STRICTLY CONFIDENTIAL.</p>
+            <div class="socials">
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js?v=2"></script>
+</body>
+
+</html>
